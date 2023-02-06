@@ -13,16 +13,13 @@ function App() {
         {id: 4, title: "ReactJS", isDone: false},
     ])
 
-
-
-
     const removeTask = (taskId: number) => {
 
         setTasks1(tasks1 = tasks1.filter(el => el.id !== taskId))
     }
 
     let[filterTask,setFilterTask]=useState<ButtonNameType>("All")
-    console.log(filterTask)
+
 
     const filteringTasks = (buttonName: ButtonNameType) => {
         setFilterTask(buttonName)
@@ -42,7 +39,7 @@ function App() {
             title="What to learn"
             tasks={filteredTasks}
             removeTask={removeTask}
-            filteringTasks={filteringTasks}
+            filteringTasks={ filteringTasks}
 
         />
     </div>

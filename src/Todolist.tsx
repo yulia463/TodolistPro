@@ -1,6 +1,5 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {ButtonNameType} from "./App";
-
 
 export type TaskType = {
     id: number
@@ -8,15 +7,15 @@ export type TaskType = {
     isDone: boolean
 }
 
-type PropsType = {
+export type PropsType = {
     title: string
     tasks: Array<TaskType>
     removeTask: (taskId:number) => void
-    filteringTasks:(buttonName:ButtonNameType)=>void
-
+    filteringTasks:(buttonName: ButtonNameType)=>void
 }
 
 export function Todolist(props: PropsType) {
+
     return <div>
         <h3>{props.title}</h3>
         <div>
