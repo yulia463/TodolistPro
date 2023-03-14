@@ -1,4 +1,7 @@
 import React, {ChangeEvent, KeyboardEvent, useState} from "react";
+import AddIcon from '@mui/icons-material/Add';
+import {IconButton} from "@mui/material";
+
 
 type PropsType={
     callback: (title: string) => void
@@ -36,7 +39,10 @@ export const AddItemForm = (props:PropsType) => {
                      onKeyPress={onKeyPressHandler}
                      className={error ? "error" : ""}
               />
-              <button onClick={addTask}>+</button>
+          {/*<IconButton aria-label="addIcon" size="small" onClick={addTask}>+*/}
+          {/*     <AddIcon fontSize="inherit" />*/}
+          {/*</IconButton>*/}
+          <button  onClick={addTask}>+</button>
               {error && <div className="error-message">{error}</div>}
       </div>
   )
