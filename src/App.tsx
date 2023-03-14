@@ -3,6 +3,8 @@ import './App.css';
 import {TaskType, Todolist} from './Todolist';
 import {v1} from 'uuid';
 import {AddItemForm} from './AddItemForm';
+import ButtonAppBar from "./components/ButtonAppBar";
+import {Container, Grid, Paper} from "@mui/material";
 
 export type FilterValuesType = "all" | "active" | "completed";
 type TodolistType = {
@@ -118,7 +120,15 @@ function App() {
 
     return (
         <div className="App">
+
+            <ButtonAppBar/>
+            <Container fixed>
+
+                <Grid style={{padding:'20px'}} container >
             <AddItemForm addItem={addTodolist} />
+                </Grid>
+
+                <Grid container spacing={1}>
             {
                 todolists.map(tl => {
                     let allTodolistTasks = tasks[tl.id];
@@ -131,7 +141,9 @@ function App() {
                         tasksForTodolist = allTodolistTasks.filter(t => t.isDone === true);
                     }
 
-                    return <Todolist
+                    return <Grid item>
+                        <Paper style={{padding:'10px'}}  elevation={3}>
+                    <Todolist
                         key={tl.id}
                         id={tl.id}
                         title={tl.title}
@@ -145,9 +157,14 @@ function App() {
                         changeTaskTitle={changeTaskTitle}
                         changeTodolistTitle={changeTodolistTitle}
                     />
+                        </Paper>
+                        </Grid>
+
                 })
             }
+                </Grid>
 
+            </Container>
         </div>
     );
 }
