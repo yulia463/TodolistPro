@@ -2,9 +2,8 @@ import React, {ChangeEvent} from 'react';
 import {FilterValuesType} from './App';
 import {AddItemForm} from './AddItemForm';
 import {EditableSpan} from './EditableSpan';
-import IconButton from "@mui/material/IconButton/IconButton";
+import {Button, Checkbox, IconButton} from "@mui/material";
 import {Delete} from "@mui/icons-material";
-import {Button, Checkbox} from "@mui/material";
 
 
 export type TaskType = {
@@ -78,7 +77,7 @@ export function Todolist(props: PropsType) {
                 })
             }
         </div>
-        <div>
+        <div style={{ paddingTop: "10px"}}>
             <Button variant={props.filter === 'all' ? 'outlined' : 'text'}
                     onClick={onAllClickHandler}
                     color={'inherit'}
