@@ -3,6 +3,8 @@ import {TaskPriorities, TaskStatuses, TaskType, todolistsAPI, UpdateTaskModelTyp
 import {Dispatch} from 'redux'
 import {AppRootStateType} from '../../app/store'
 import {setErrorAC, setErrorStatusACType, setRequestStatusAC, setRequestStatusType} from "../../app/app-reducer";
+import {handleServerAppError, handleServerNetworkError} from "../../utils/error-utils";
+import axios, {AxiosError, AxiosResponse} from "axios";
 
 const initialState: TasksStateType = {}
 
@@ -74,16 +76,16 @@ export const addTaskTC = (title: string, todolistId: string) => (dispatch: Dispa
         .then(res => {
             if (res.data.resultCode === ResultCode.OK) {
                 const task = res.data.data.item
-                dispatch(addTaskAC(task))
-                dispatch(setRequestStatusAC('succeeded'))
-            } else {
-                if (res.data.messages.length) {
-                    dispatch(setErrorAC(res.data.messages[0]))
-                } else {
-                    dispatch(setErrorAC('Some error occurred'))
-                }
+                const action = addTaskAC(task)
                 dispatch(setRequestStatusAC('idle'))
+                dispatch(action)
+            } else {
+                handleServerAppError<{ item: TaskType }>(dispatch, res.data)
             }
+        })
+        .catch((e: AxiosError<ErrorsType>) => {
+            const errorMessage = e.response ? e.response?.data.message : e.message
+            handleServerNetworkError(dispatch, errorMessage)
         })
 }
 
@@ -94,7 +96,7 @@ export enum ResultCode {
 }
 
 export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelType, todolistId: string) =>
-    (dispatch: Dispatch<ActionsType>, getState: () => AppRootStateType) => {
+    async (dispatch: Dispatch<ActionsType>, getState: () => AppRootStateType) => {
         dispatch(setRequestStatusAC('loading'))
         const state = getState()
         const task = state.tasks[todolistId].find(t => t.id === taskId)
@@ -113,15 +115,52 @@ export const updateTaskTC = (taskId: string, domainModel: UpdateDomainTaskModelT
             status: task.status,
             ...domainModel
         }
-
-        todolistsAPI.updateTask(todolistId, taskId, apiModel)
-            .then(res => {
+        try {
+            const res = await todolistsAPI.updateTask(todolistId, taskId, apiModel)
+            if (res.data.resultCode === ResultCode.OK) {
                 const action = updateTaskAC(taskId, domainModel, todolistId)
                 dispatch(action)
                 dispatch(setRequestStatusAC('succeeded'))
-            })
-    }
+            } else {
+                if (res.data.messages.length) {
+                    dispatch(setErrorAC(res.data.messages[0]))
+                } else {
+                    dispatch(setErrorAC('Some error occurred'))
+                }
+                dispatch(setRequestStatusAC('idle'))
+            }
+        } catch (e) {
+            if(axios.isAxiosError<ErrorsType>(e)){
+                handleServerNetworkError(dispatch, e.message)
 
+            }
+
+        }
+        // todolistsAPI.updateTask(todolistId, taskId, apiModel)
+        //     .then(res => {
+        //         if (res.data.resultCode === ResultCode.OK) {
+        //             const action = updateTaskAC(taskId, domainModel, todolistId)
+        //             dispatch(action)
+        //             dispatch(setRequestStatusAC('succeeded'))
+        //         } else {
+        //             if (res.data.messages.length) {
+        //                 dispatch(setErrorAC(res.data.messages[0]))
+        //             } else {
+        //                 dispatch(setErrorAC('Some error occurred'))
+        //             }
+        //             dispatch(setRequestStatusAC('idle'))
+        //         }
+        //
+        //     })
+        //     .catch((e: AxiosError<ErrorsType>) => {
+        //         const errorMessage = e.response ? e.response?.data.message : e.message
+        //         handleServerNetworkError(dispatch, errorMessage)
+        //     })
+    }
+type ErrorsType = {
+    field: string
+    message: string
+}
 // types
 export type UpdateDomainTaskModelType = {
     title?: string

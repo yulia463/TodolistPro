@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import {Delete} from '@mui/icons-material';
 import {useAppDispatch} from "../../../app/store";
+import {RequestStatusType} from "../../../app/app-reducer";
 
 type PropsType = {
     id: string
@@ -22,6 +23,7 @@ type PropsType = {
     removeTodolist: (id: string) => void
     changeTodolistTitle: (id: string, newTitle: string) => void
     filter: FilterValuesType
+    entityStatus:RequestStatusType
 
 }
 
@@ -62,7 +64,7 @@ export const Todolist = React.memo(function (props: PropsType) {
 
     return <div>
         <h3><EditableSpan value={props.title} onChange={changeTodolistTitle}/>
-            <IconButton onClick={removeTodolist}>
+            <IconButton onClick={removeTodolist} disabled={props.entityStatus ==='loading'}>
                 <Delete/>
             </IconButton>
         </h3>
